@@ -1,12 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>menu</title>
-  </head>
-  <body>
-    <h1>indexページ</h1>
-    <a href="/main">ここを押すと mainへ</a>
+<head>
+    <title>VRC</title>
+    <style>
+        @import url(//fonts.googleapis.com/css?family=Montserrat:9000);
+        *:before, *:after {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, "Hiragino Kaku Gothic Pro W3", Meiryo, sans-serif;
+            background-image: url("src/bg-main.jpg"); /* 背景画像のURL */
+            background-size: cover; /* 画像を要素のサイズに合わせて拡大/縮小 */
+            background-repeat: no-repeat; /* 画像の繰り返しを防ぐ */
+            background-position: center; /* 画像を要素の中央に配置 */
+            color: #999;
+            text-align: center;
+        }
+        h1 {
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            color: #616464;
+            margin: 20px auto;
+        }
+        .box1 {
+            width:60%;
+            margin-top: 70px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 50px;
 
-  </body>
+        }
+        .box2 {
+            padding:15px;
+            margin-left: auto;
+            margin-right: auto;
+            border: solid 1px #999;
+            border-radius: 10px;
+            width:70%;
+            margin-bottom: 50px;
+        }
+        .sub {
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Robot Library for VRCS <span style="font-size:80%;">(RRS2)</span></h1>
+
+    <div class="box1">
+        <span class="sub">The RRS-2 (VRC) interface was developed by automotive, robot and simulator manufacturers to integrate robot 
+             controller software into a simulation system via an interface, enabling highly accurate controller simulation.</span>
+    </div>    
+    <div class="box2 sub" >
+        <span>バーチャルロボットコミュニケーションシステム(VRCS)は、ロボットコントローラソフトウェアをシミュレーションシステムに統合するための
+            ソフトウェアインターフェイスだけでなく、加えて各ロボットメーカーコントロ―ラも利用可能なクラウドサービスとして提供しております。
+            お客様は、ロボットコントローラ毎にVRCモジュールを所有することなく、VRCシミュレーションを実行することができます。
+
+            ロボット動作指令を所定のフォーマットで送信することで、VRCSはロボットコントローラの動作をシミュレーションします。</span>
+    </div>
+    </br>
+    <a href="main">Go to Library</a></br>
+    
+    <a href="convert">Go to convert</a></br>
+    
+</body>
 </html>

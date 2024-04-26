@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>変換</title>
+</head>
+<body>
+<h1>変換</h1>
+<button id="convertButton">変換</button>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+document.getElementById('convertButton').addEventListener('click', function() {
+fetch('/convert-xml')
+.then(response => response.text())
+.then(data => {
+alert(data);
+})
+.catch(error => {
+console.error('エラー:', error);
+});
+});
+});
+</script>
+</body>
+</html>

@@ -1,301 +1,387 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-language" content="en"> 
-    <title>main</title>
-    <script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
- 
-    <link type="text/css" rel="stylesheet" href="/public/css/main.css">
- </head>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>VRC</title>
 
- <style>
+<style>
+@import url(//fonts.googleapis.com/css?family=Montserrat:9000);
+*:before, *:after {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+body {
+    font-family: Arial, "Hiragino Kaku Gothic Pro W3", Meiryo, sans-serif;
+    background-image: url("src/bg-main.jpg"); /* 背景画像のURL */
+    background-size: cover; /* 画像を要素のサイズに合わせて拡大/縮小 */
+    background-repeat: no-repeat; /* 画像の繰り返しを防ぐ */
+    background-position: center; /* 画像を要素の中央に配置 */
+    color: #999;
+    text-align: center;
+}
+h1 {
+    font-size: 30px;
+    font-family: Arial, sans-serif;
+    color: #616464;
+    margin: 20px auto;
+}
+header {
+    position: fixed;
+    top: 0;
+    left:0;
+    width: 100%;
+    background: #f8f8f8;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+.filter-controls {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.filter-controls .control {
+    display: inline-block;
+    width: 240px;
+    margin: 0 10px;
+}
+.filter-controls .control * {
+    box-sizing: border-box;
+}
+.filter-controls .control .form-control {
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.filter-controls .control .form-control:focus {
+    outline: 0;
+    border-color: #0CAAF5;
+}
+.grid {
+    position: relative;
+    max-width: 100%;
+    margin-top:152px; /* ヘッダーの高さ分のマージンを設定 */
+    margin-left: 30px;
+}
+.item {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    margin: 10px;
+    z-index: 100;
+    transition: transform 0.1s ease;
+    cursor: move;
+}
+div[data-maker="YASKAWA"]  .custom-content {
+    border-color: blue;
+}
+div[data-maker="NACHI"]  .custom-content {
+  border-color: #ff0000;
+}
+div[data-maker="KAWASAKI"] .custom-content {
+    border-color: #000000;
+}
+div[data-maker="FANUC"]  .custom-content {
+    border-color: #fcd203;
+}
+.item-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: table;   
+}
+.custom-content {
+    max-width: 250px;
+    box-sizing: border-box; /* paddingとborderを幅に含める */
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    background: #fff;
+    color: #666;
+    border: 2px solid;
+    border-radius: 10px;
+    overflow: hidden; /* コンテンツがはみ出た場合に非表示にする */
+    text-overflow: ellipsis; /* はみ出たテキストを省略記号で表示 */
+    padding-left: 1px;;
+}
+.textline {  /*robot id　が長すぎる場合*/
+    /*　上のoverflowとtext-overflowとの3点セット */
+    white-space: nowrap; /* テキストを改行せずに1行にする */
+}
+.item.muuri-item-dragging {
+    z-index: 3;
+    transition: none;
+}
+.item.muuri-item-releasing {
+    z-index: 2;
+}
+@media (max-width: 877px) {
+    .item {
+        width: calc(33.33% - 11px);
+        height: calc(33.33vw - 11px);
+    }
+}
+@media (max-width: 640px) {
+    .item {
+        width: calc(50% - 10px);
+        height: calc(50vw - 10px);
+    }
+}
 
- </style>
+
+.item img {            /*robot画像*/
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 0px;
+}
+
+
+.tooltip {    /*------------------------------------------------*/
+    position: relative;
+    cursor: pointer;
+}
+/* ツールチップ全体の設定 */
+.tooltip::before,
+.tooltip::after {
+    position: absolute;
+    opacity: 0;
+    transition: all 0.3s;
+    /* ツールチップのスタイル */
+    width: 235px; /* ツールチップの幅を指定 */
+    white-space: normal; /* テキストを折り返す */
+    overflow-wrap: break-word; /* 長い単語も折り返す */
+}
+/* 吹き出しの本体 */
+.tooltip::after {
+    content: attr(data-tooltip);
+    display: block;
+    background: #555555;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #fff;
+}
+/* マウスホバーしたときの設定 */
+.tooltip:hover::before{
+    opacity: 1;
+}
+.tooltip:hover::after{
+    opacity: 1;
+}   /*---------------------------------------------tooltip*/
+
+.example {
+    position: absolute;
+    display: inline-block;
+    top:42px;
+    left:80%;
+    width: 200px;
+    height: 90px;
+    background: #fff;
+    color: #666;
+    border: 1px solid;
+    border-radius: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 5px;
+    line-height: 22px;
+}
+@media (max-width: 1300px) {
+.example {
+    display: none;
+}
+}
+</style>
+</head>
+
+<body>
+<section class="grid-wrapper">
+  <header>
+  <h1>Robot Library for VRCS <span style="font-size:80%;">(RRS2)</span></h1>
  
-  <body>
-    <div class="wrapper">
-      <section class="grid-wrapper">
-        <header>
-          <h3 id="mainTitle">Virtual Robot Library</h3>
-            <div class="filter-controls">
-              <div class="control">Search
-                <input class="search-field form-control" type="text" name="search" placeholder="Enter the robot name">
-              </div>
-              <div class="control">Filter
-                <select class="filter-field form-control">
-                  <option value="">none</option>
-                  <option value="KHI">KHI</option>
-                  <option value="NACHI">NACHI</option>
-                  <option value="YASKAWA">YASKAWA</option>
-                  <option value="FANUC">FANUC</option>
-                </select>
-              </div>
-              <div class="control">Sort
-                <select class="sort-field form-control">
-                  <option value="order">None</option>
-                  <option value="color">Order by Reach</option>     <!--data-color-->
-                  <option value="title">Order by Payload</option>   <!--data-title-->
-                </select>
-              </div>
-            </div>
-          </header>
-            <div class="grid">            
-              <div class="item NACHI" data-scolor="1000mm" data-title="100kg">
-                <div class="item-content">
-                  <!-- Safe zone, enter your custom markup -->
-                    <div class="custom-content">
-                      <img src="public\png\KHI\UX120-E001-C52-TMC-SPT.ini.bmp" class="card__image_02">                  
-                      12345678UX120-E001-C52-TMC-SPT.ini</br>
-                      1200mm</br>
-                      120kg</br>
-                    </div>
-                  <!-- Safe zone ends -->
-                </div>
-              </div>
-              <div class="item KHI" data-color="2000mm" data-title="200kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 2<br />(orange)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="2000mm" data-title="200kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 3<br />(banana apple)
-                  </div>
-                </div>
-              </div>
-              <div class="item KHI" data-color="1000mm" data-title="120kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 4<br />(grape orange)
-                  </div>
-                </div>
-              </div>
-              <div class="item KHI" data-color="770mm" data-title="90kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 5<br />(strawberry)
-                  </div>
-                </div>
-              </div>
-              <div class="item NACHI" data-color="1220mm" data-title="105kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 6<br />(cherry banana)
-                  </div>
-                </div>
-              </div>
-              <div class="item KHI" data-color="1040mm" data-title="105kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 7<br />(melon apple)
-                  </div>
-                </div>
-              </div>
-              <div class="item FANUC" data-color="900mm" data-title="95kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 8<br />(kiwi)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="2100mm" data-title="290kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 9<br />(watermelon)
-                  </div>
-                </div>
-              </div>
-              <div class="item NACHI" data-color="3000mm" data-title="2000kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 10<br />(pineapple)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="2500" data-title="100kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 11<br />(NACHIberry)
-                  </div>
-                </div>
-              </div>
-              <div class="item KHI" data-color="1400mm"  data-title="150kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 12<br />(peach)
-                  </div>
-                </div>
-              </div>
-              <div class="item FANUC" data-color="990mm" data-title="190kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 13<br />(lemon)
-                  </div>
-                </div>
-              </div>
-              <div class="item FANUC" data-color="1800mm" data-title="210kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 14<br />(grapefruit)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="1890mm" data-title="250kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 15<br />(guava)
-                  </div>
-                </div>
-              </div>
-              <div class="item KHI" data-color="2400mm" data-title="350kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 16<br />(yellow strawberry)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="2500mm" data-title="220kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 17<br />(avocado)
-                  </div>
-                </div>
-              </div>
-              <div class="item YASKAWA" data-color="2130mm" ata-title="190kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 18<br />(grape)
-                  </div>
-                </div>
-              </div>
-              <div class="item NACHI" data-color="1900mm" data-title="130kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 19<br />(peach banana)
-                  </div>
-                </div>
-              </div>
-              <div class="item NACHI" data-color="910mm" data-title="30kg">
-                <div class="item-content">
-                  <div class="custom-content">
-                    Item 20<br />(grape)
-                  </div>
-                </div>
-              </div>
-            </div><!-- grid -->
-        </br>
-        </br>
-        </br>
-        <footer>
-            <a>Toyota Production Engineering</a>
-        </footer>
-      </section><!-- grid-wrapper -->
-    </div><!-- wrapper -->
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/2.0.6/velocity.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/muuri@0.9.3/dist/muuri.min.js"></script>
-  
-  
-  
-  <script>
-     document.addEventListener('DOMContentLoaded', function () {
-    var grid = null,
-        wrapper = document.querySelector('.grid-wrapper'),
-        searchField = wrapper.querySelector('.search-field'),
-        filterField = wrapper.querySelector('.filter-field'),
-        sortField = wrapper.querySelector('.sort-field'),
-        gridElem = wrapper.querySelector('.grid'),
-        searchAttr = 'data-title',
-        filterAttr = 'data-color',
-        searchFieldValue,
-        filterFieldValue,
-        sortFieldValue,
-        dragOrder = [];
-  
-    // Init the grid layout
-    grid = new Muuri(gridElem, {
-      dragEnabled: true
-    });
-    
-    // Set inital search query, active filter, active sort value and active layout.
-    searchFieldValue = searchField.value.toLowerCase();
-    filterFieldValue = filterField.value;
-    sortFieldValue = sortField.value;
-  
-    // Search field event binding
-    searchField.addEventListener('keyup', function () {
-      var newSearch = searchField.value.toLowerCase();
-      if (searchFieldValue !== newSearch) {
-        searchFieldValue = newSearch;
-        filter();
-      }
-    });
-  
-    // Filter field event binding
-    filterField.addEventListener('change', filter);
-    
-    // Sort field event binding
-    sortField.addEventListener('change', sort);
-  
-    // Filtering
-    function filter() {
-      filterFieldValue = filterField.value;
-      grid.filter(function (item) {
-        var element = item.getElement(),
-            isSearchMatch = !searchFieldValue ? true : (element.getAttribute(searchAttr) || '').toLowerCase().indexOf(searchFieldValue) > -1,
-            isFilterMatch = !filterFieldValue ? true : (element.getAttribute(filterAttr) || '') === filterFieldValue;
-        return isSearchMatch && isFilterMatch;
-      });
-    }
-    
-    // Sorting
-    function sort() {
-      // Do nothing if sort value did not change.
-      var currentSort = sortField.value;
-      if (sortFieldValue === currentSort) {
-        return;
-      }
-  
-      // If we are changing from "order" sorting to something else
-      // let's store the drag order.
-      if (sortFieldValue === 'order') {
-        dragOrder = grid.getItems();
-      }
-  
-      // Sort the items.
-      grid.sort(
-        currentSort === 'title' ? compareItemTitle :
-        currentSort === 'color' ? compareItemColor :
-        dragOrder
-      );
-      sortFieldValue = currentSort;
-    }
-    
-    // Compare data-title
-    function compareItemTitle(a, b) {
-      var aVal = a.getElement().getAttribute(searchAttr) || '';
-      var bVal = b.getElement().getAttribute(searchAttr) || '';
-      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-  
-    }
-  
-    // Compare data-color
-    function compareItemColor(a, b) {
-      var aVal = a.getElement().getAttribute(filterAttr) || '';
-      var bVal = b.getElement().getAttribute(filterAttr) || '';
-      return aVal < bVal ? -1 : aVal > bVal ? 1 : compareItemTitle(a, b);
-    }
+  <div class="example">
+      <a>model image</a></br>
+      <a>configuration name</a></br>
+      <a>Reach (mm)</a></br>
+      <a>Payload (kg)</a>
+  </div>
+  <div class="filter-controls">
+
+    <div class="control">Search
+      <input class="search-field form-control" type="text" name="search" placeholder="Enter the RBname">
+    </div>
+    <div class="control">MakerFilter  <!--data-makerでフィルタリング-->
+      <select class="filter-field form-control">
+        <option value="">All</option>
+        <option value="NACHI">NACHI</option>
+        <option value="YASKAWA">YASKAWA</option>
+        <option value="KAWASAKI">KAWASAKI</option>
+        <option value="FANUC">FANUC</option>
+      </select>
+    </div>
+    <div class="control">Sort
+      <select class="sort-field form-control">
+        <option value="order">-</option>
+        <option value="dateorder">new arrival</option>
+        <option value="asc-payload">payload(asc)</option>
+        <option value="desc-payload">payload(desc)</option>
+        <option value="asc-reach">reach length(asc)</option>
+        <option value="desc-reach">reach length(desc)</option>
+      </select>
+    </div>
+  </div>
+  </header>
+
+  <div class="grid">
+    <% robots.forEach(function(robot) { %>
+    <div class="item" data-maker="<%= robot.maker %>" name="<%= robot.id %>" payload="<%= parseInt(robot.payload) %>" reach="<%= parseInt(robot.reach) %>" date="<%= robot.date %>"> <!--data-カスタムデータ属性-->
+      <div class="item-content">
+        <!-- Safe zone, enter your custom markup -->
+          <div class="custom-content">
+            <img src="<%= robot.src %>" alt="<%= robot.id %>">
+            <span class="tooltip  textline" data-tooltip="<%= robot.id %>"><%= robot.id %></span></br>
+            <a><%= robot.maker %></a></br>
+            <a><%= robot.reach %></a></br>
+            <a><%= robot.payload %></a></br>
+            <a><%= robot.date %></a>   <!--登録日付はリリース前に消すこと　日付ソート機能が動いているか確認のため-->
+          </div>
+
+        <!-- Safe zone ends -->
+      </div>
+    </div>
+  <% }); %>
+ </div>
+</select>
+
+
+<script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/muuri/0.9.3/muuri.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var grid = null,
+      wrapper = document.querySelector('.grid-wrapper'),
+      searchField = wrapper.querySelector('.search-field'),
+      filterField = wrapper.querySelector('.filter-field'),
+      sortField = wrapper.querySelector('.sort-field'),
+      gridElem = wrapper.querySelector('.grid'),
+      searchAttr = 'name',
+      filterAttr = 'data-maker',
+      payload = 'payload',
+      reach = 'reach',
+      searchFieldValue,
+      filterFieldValue,
+      sortFieldValue,
+      dragOrder = [];
+
+  // Init the grid layout
+  grid = new Muuri(gridElem, {
+    dragEnabled: true
   });
   
-  </script>
-  
+  // Set inital search query, active filter, active sort value and active layout.
+  searchFieldValue = searchField.value.toLowerCase();
+  filterFieldValue = filterField.value;
+  sortFieldValue = sortField.value;
 
-  </body>
-</html>
+  // Search field event binding
+  searchField.addEventListener('keyup', function () {
+    var newSearch = searchField.value.toLowerCase();
+    if (searchFieldValue !== newSearch) {
+      searchFieldValue = newSearch;
+      filter();
+    }
+  });
+
+  // Filter field event binding
+  filterField.addEventListener('change', filter);
+  
+  // Sort field event binding
+  sortField.addEventListener('change', sort);
+
+  // Filtering
+  function filter() {
+    filterFieldValue = filterField.value;
+    grid.filter(function (item) {
+      var element = item.getElement(),
+          isSearchMatch = !searchFieldValue ? true : (element.getAttribute(searchAttr) || '').toLowerCase().indexOf(searchFieldValue) > -1,
+          isFilterMatch = !filterFieldValue ? true : (element.getAttribute(filterAttr) || '') === filterFieldValue;
+      return isSearchMatch && isFilterMatch;
+    });
+  }
+  
+  // Sorting
+  function sort() {
+    // Do nothing if sort value did not change.
+    var currentSort = sortField.value;
+    if (sortFieldValue === currentSort) {
+      return;
+    }
+
+    // If we are changing from "order" sorting to something else
+    // let's store the drag order.
+    if (sortFieldValue === 'order') {
+      dragOrder = grid.getItems();
+    }
+    
+    // Sort the items.
+    grid.sort(
+      currentSort === 'dateorder' ? compareItemDate :
+      currentSort === 'asc-payload' ? compareItemAscPayload :
+      currentSort === 'asc-reach' ? compareItemAscReach :
+      currentSort === 'desc-payload' ? compareItemDescPayload :
+      currentSort === 'desc-reach' ? compareItemDescReach :
+      dragOrder
+    );
+    sortFieldValue = currentSort;
+  }
+
+    // Compare Date
+   function compareItemDate(a, b) {
+    var aVal = new Date(a.getElement().getAttribute('date'));
+    var bVal = new Date(b.getElement().getAttribute('date'));
+    return bVal - aVal;
+  }
+   // Compare Payload
+   function compareItemAscPayload(a, b) {
+    // filterAttrを取得し、整数に変換する
+    var aVal = parseInt(a.getElement().getAttribute(payload), 10) || 0;
+    var bVal = parseInt(b.getElement().getAttribute(payload), 10) || 0;
+    // 整数として比較する
+    return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+  }
+   // Compare Reach
+   function compareItemAscReach(a, b) {
+    // filterAttrを取得し、整数に変換する
+    var aVal = parseInt(a.getElement().getAttribute(reach), 10) || 0;
+    var bVal = parseInt(b.getElement().getAttribute(reach), 10) || 0;
+    // 整数として比較する
+    return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+  }
+     // Compare Desc-Payload
+   function compareItemDescPayload(a, b) {
+    // filterAttrを取得し、整数に変換する
+    var aVal = parseInt(a.getElement().getAttribute(payload), 10) || 0;
+    var bVal = parseInt(b.getElement().getAttribute(payload), 10) || 0;
+    // 整数として比較する
+    return bVal < aVal ? -1 : bVal > aVal ? 1 : 0;
+  }
+  
+   // Compare Desc-Reach
+   function compareItemDescReach(a, b) {
+    // filterAttrを取得し、整数に変換する
+    var aVal = parseInt(a.getElement().getAttribute(reach), 10) || 0;
+    var bVal = parseInt(b.getElement().getAttribute(reach), 10) || 0;
+    // 整数として比較する
+    return bVal < aVal ? -1 : bVal > aVal ? 1 : 0;
+  }
+});
+</script>
+</body>
+</html>  
